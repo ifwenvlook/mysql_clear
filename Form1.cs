@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySql.Data;
-
+using System.IO;
 namespace mysql
 {
     public partial class Form1 : Form
@@ -16,13 +16,16 @@ namespace mysql
         connect_mysql connect1;
         MySqlCommand comm;
         MySqlConnection conn;
+        file_io file1;
         public Form1()            
         {            
             InitializeComponent();
             connect1 = new connect_mysql { database = "css" };           
             string connect_str = connect1.connect_str();
             conn = new MySqlConnection(connect_str);
-            comm = new MySqlCommand(connect1.sqlstr, conn); 
+            comm = new MySqlCommand(connect1.sqlstr, conn);
+            file1 = new file_io { creat_path = @"C:\Users\wlz\Desktop\test.txt", record_path = @"C:\Users\wlz\Desktop\test.txt" };
+
             
         }
 
@@ -139,6 +142,34 @@ namespace mysql
         {
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf("record_item");
         }
+
+        /*private void button4_Click(object sender, EventArgs e)//创建文件示例
+        {
+            //参数1：指定要判断的文件路径
+            if (!File.Exists(file1.creat_path))
+            {
+                //参数1：要创建的文件路径，包含文件名称、后缀等
+                FileStream fs = File.Create(file1.creat_path);
+                fs.Close();
+                MessageBox.Show("文件创建成功！");
+            }
+            else
+            {
+                MessageBox.Show("文件已经存在！");
+            }
+        }*/
+        private void button4_Click(object sender,EventArgs E)
+        {
+            if (File.Exists(file1.record_path))
+            {
+                File.Delete(file1.record_path);
+                MessageBox.Show("删除成功");
+            }
+            else
+            { MessageBox.Show("文件不存在！"); }
+        }
+
+
         
     }
 }
