@@ -15,8 +15,6 @@ namespace mysql
         public string password;
         public string database;
         public string sqlstr;
-        public MySqlCommand comm;
-
         public string connect_str()
         {
             string x = "server=" + ip_mysqlserver + ";user id=" +

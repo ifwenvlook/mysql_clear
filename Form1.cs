@@ -13,46 +13,48 @@ namespace mysql
 {
     public partial class Form1 : Form
     {
-        connect_mysql connect1;
+        connect_mysql connect1 = new connect_mysql();
         MySqlCommand comm;
         MySqlConnection conn;
         file_io file1;
+
+        public void update_text()
+        {
+            connect1.ip_mysqlserver = textBox1.Text;
+            connect1.user_id = textBox4.Text;
+            connect1.password = textBox3.Text;
+            connect1.database = "css";
+        }
+
         public Form1()            
         {            
             InitializeComponent();
-            connect1 = new connect_mysql { database = "css" };           
-            string connect_str = connect1.connect_str();
-            conn = new MySqlConnection(connect_str);
-            comm = new MySqlCommand(connect1.sqlstr, conn);
+            update_text();           
+            conn = new MySqlConnection(connect1.connect_str());
             file1 = new file_io { creat_path = @"C:\Users\wlz\Desktop\test.txt", record_path = @"C:\Users\wlz\Desktop\test.txt" };
-
+       
             
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            connect1.ip_mysqlserver = textBox1.Text;
-            connect1.user_id = textBox4.Text;
-            connect1.password = textBox3.Text;
+            update_text();            
             if (connect1.connect_sucessfull)
             { label2.Text = "成功"; MessageBox.Show("连接成功"); }
             else
-            { label2.Text = "失败"; MessageBox.Show("连接失败"); }            
+            { label2.Text = "失败"; MessageBox.Show("连接失败"); }
         }
 
         private void button2_Click(object sender, EventArgs e)
 
         {
-            connect1.ip_mysqlserver = textBox1.Text;
-            connect1.user_id = textBox4.Text;
-            connect1.password = textBox3.Text;
+            update_text();
             if (connect1.connect_sucessfull)
             {
                 label2.Text = "成功";
-                string connect_str = connect1.connect_str();
                 connect1.sqlstr = "SELECT * FROM  record_item ";
-                conn = new MySqlConnection(connect_str);
                 comm = new MySqlCommand(connect1.sqlstr, conn);
+                Console.WriteLine(connect1.sqlstr + connect1.connect_str());
                 MySqlDataAdapter adap = new MySqlDataAdapter(comm);
                 DataSet ds = new DataSet();
                 adap.Fill(ds);
@@ -66,15 +68,11 @@ namespace mysql
 
         private void button3_Click(object sender, EventArgs e)
         {
-            connect1.ip_mysqlserver = textBox1.Text;
-            connect1.user_id = textBox4.Text;
-            connect1.password = textBox3.Text;
+            update_text();
             if (connect1.connect_sucessfull)
             { label2.Text = "成功"; }
             else
-            { label2.Text = "失败"; }
-            string connect_str = connect1.connect_str();
-            MySqlConnection conn = new MySqlConnection(connect_str);
+            { label2.Text = "失败"; }            
             string timemin=dateTimePicker1.Value.ToString("yyyy-MM-dd HH:mm");
             string timemax=dateTimePicker2.Value.ToString("yyyy-MM-dd HH:mm");
             string timenow = string.Format("{0:d}", System.DateTime.Now);
@@ -143,6 +141,7 @@ namespace mysql
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf("record_item");
         }
 
+
         /*private void button4_Click(object sender, EventArgs e)//创建文件示例
         {
             //参数1：指定要判断的文件路径
@@ -158,7 +157,7 @@ namespace mysql
                 MessageBox.Show("文件已经存在！");
             }
         }*/
-        private void button4_Click(object sender,EventArgs E)
+       /* private void button4_Click(object sender,EventArgs E)
         {
             if (File.Exists(file1.record_path))
             {
@@ -168,8 +167,37 @@ namespace mysql
             else
             { MessageBox.Show("文件不存在！"); }
         }
+        */
 
-
-        
+        private void button4_Click(object sender, EventArgs e)
+        {
+            update_text();
+            string timemin = dateTimePicker1.Value.ToString("yyyy-MM-dd HH:mm");
+            string timemax = dateTimePicker2.Value.ToString("yyyy-MM-dd HH:mm");
+            string timenow = string.Format("{0:d}", System.DateTime.Now);
+            string table = comboBox1.SelectedItem.ToString();
+            connect1.sqlstr = "select BEGIN_TIME FROM " + " record_item" + " WHERE \"" + timemin + "\" < BEGIN_TIME < \"" + timemax + "\"";
+            Console.WriteLine(connect1.sqlstr + connect1.connect_str());
+            comm = new MySqlCommand(connect1.sqlstr,conn);
+            conn.Open();
+            MySqlDataReader dateReader = comm.ExecuteReader();
+            if (dateReader.Read())
+            {
+                string record_begin_time =(string) dateReader[0].ToString();    
+                record_begin_time=record_begin_time.Remove(4,1); record_begin_time = record_begin_time.Remove(5, 1);
+                record_begin_time= record_begin_time.Insert(4,"-" ); record_begin_time= record_begin_time.Insert(6,"-");
+                dateReader.Close();
+                Console.WriteLine("时间: "+record_begin_time);
+                conn.Close();
+                string s = "hello world!"; ;
+                s = s.Remove(0, 1);    //  ello world
+                Console.WriteLine(s);
+                s = s.Insert(0, "H");  //  Hello world
+                Console.WriteLine(s);
+            }
+            else
+            { Console.WriteLine(connect1.sqlstr); }
+            conn.Close();
+        }
     }
 }
