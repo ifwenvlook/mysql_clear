@@ -151,7 +151,7 @@
             this.textBox2.Location = new System.Drawing.Point(57, 359);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(923, 40);
+            this.textBox2.Size = new System.Drawing.Size(923, 135);
             this.textBox2.TabIndex = 13;
             // 
             // dataGridView1
@@ -260,7 +260,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1033, 466);
+            this.ClientSize = new System.Drawing.Size(1033, 536);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);

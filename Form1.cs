@@ -29,7 +29,8 @@ namespace mysql
         {            
             InitializeComponent();
             update_text();           
-            conn = new MySqlConnection(connect1.connect_str());      
+            conn = new MySqlConnection(connect1.connect_str());
+            textBox2.Text = "初始化完成";
             
         }
 
@@ -37,9 +38,9 @@ namespace mysql
         {
             update_text();            
             if (connect1.connect_sucessfull)
-            { label2.Text = "成功"; MessageBox.Show("连接成功"); }
+            { label2.Text = "成功"; MessageBox.Show("连接成功"); textBox2.AppendText("\r\n连接数据库成功"); }
             else
-            { label2.Text = "失败"; MessageBox.Show("连接失败"); }
+            { label2.Text = "失败"; MessageBox.Show("连接失败"); textBox2.AppendText("\r\n连接失败"); }
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -49,6 +50,7 @@ namespace mysql
             if (connect1.connect_sucessfull)
             {
                 label2.Text = "成功";
+                textBox2.AppendText("\r\n连接数据库成功");
                 connect1.sqlstr = "SELECT * FROM  record_item ";
                 comm = new MySqlCommand(connect1.sqlstr, conn);
                 Console.WriteLine(connect1.sqlstr + connect1.connect_str());
@@ -56,7 +58,7 @@ namespace mysql
                 DataSet ds = new DataSet();
                 adap.Fill(ds);
                 dataGridView1.DataSource = ds.Tables[0].DefaultView;
-                textBox2.Text = connect1.sqlstr;
+                textBox2.AppendText("\r\n" + connect1.sqlstr);
             }
 
             else
@@ -78,6 +80,7 @@ namespace mysql
             {
                 connect1.sqlstr = "SELECT FILE_PATH FROM " + table + " WHERE BEGIN_TIME >=  \"" + timemin + "\" AND BEGIN_TIME <= \"" + timemax + " \"";                
                 comm = new MySqlCommand(connect1.sqlstr, conn);
+                textBox2.AppendText("\r\n" + connect1.sqlstr);
                 conn.Open();
                 Console.WriteLine(connect1.sqlstr);                
                 MySqlDataReader dateReader = comm.ExecuteReader();
@@ -119,7 +122,7 @@ namespace mysql
 
                 }
                 conn.Close();//关闭连接
-                textBox2.Text = connect1.sqlstr;
+                textBox2.AppendText("\r\n" + connect1.sqlstr);
             }
             else if (table != "record_item" && connect1.connect_sucessfull)
             {
@@ -145,10 +148,10 @@ namespace mysql
                     Console.WriteLine("this is table: " + table);
                     Console.WriteLine(table + "中的数据为空");
                     MessageBox.Show("删除失败," + table + " 表是空的");
+                    textBox2.AppendText("\r\n" + connect1.sqlstr);
 
                 }
-                conn.Close();//关闭连接
-                textBox2.Text = connect1.sqlstr;
+                conn.Close();//关闭连接                
             }
             else { MessageBox.Show("无法连接数据库服务"); }  
         }
