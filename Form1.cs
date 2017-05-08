@@ -16,7 +16,6 @@ namespace mysql
         connect_mysql connect1 = new connect_mysql();
         MySqlCommand comm;
         MySqlConnection conn;
-        file_io file1;
 
         public void update_text()
         {
@@ -30,9 +29,7 @@ namespace mysql
         {            
             InitializeComponent();
             update_text();           
-            conn = new MySqlConnection(connect1.connect_str());
-            file1 = new file_io { creat_path = @"C:\Users\wlz\Desktop\test.txt", record_path = @"C:\Users\wlz\Desktop\test.txt" };
-       
+            conn = new MySqlConnection(connect1.connect_str());      
             
         }
 
@@ -79,22 +76,41 @@ namespace mysql
             string table=comboBox1.SelectedItem.ToString();
             if (table == "record_item" && connect1.connect_sucessfull)
             {
-                connect1.sqlstr = "DELETE FROM " + table + " WHERE \"" + timemin + "\" < BEGIN_TIME < \"" + timemax + "\"";                
+                connect1.sqlstr = "SELECT FILE_PATH FROM " + table + " WHERE BEGIN_TIME >=  \"" + timemin + "\" AND BEGIN_TIME <= \"" + timemax + " \"";                
                 comm = new MySqlCommand(connect1.sqlstr, conn);
                 conn.Open();
+                Console.WriteLine(connect1.sqlstr);                
+                MySqlDataReader dateReader = comm.ExecuteReader();
+                while (dateReader.Read())
+                    {
+                        string record_path = (string)dateReader[0].ToString();
+                        //record_begin_time = record_begin_time.Remove(4, 1); record_begin_time = record_begin_time.Remove(5, 1);
+                       //record_begin_time = record_begin_time.Insert(4, "-"); record_begin_time = record_begin_time.Insert(6, "-");
+                       //Console.WriteLine("时间: " + record_begin_time); 
+                        try
+                        {
+                            File.Delete(record_path);
+                            Console.WriteLine(record_path);
+                        }
+                        catch (Exception)
+                        { MessageBox.Show("未找到对应文件: "+record_path); }
+                    }
+                dateReader.Close();
+                conn.Close();
+                conn.Open();
+                connect1.sqlstr = "DELETE FROM " + table + " WHERE BEGIN_TIME >= \"" + timemin + "\" AND BEGIN_TIME <= \"" + timemax + " \"";
+                comm = new MySqlCommand(connect1.sqlstr, conn);
                 Console.WriteLine(connect1.sqlstr);
                 int iRet = comm.ExecuteNonQuery();//这里返回的是受影响的行数，为int值。可以根据返回的值进行判断是否插入成功。
                 if (iRet > 0)
-                {
-
-                    MessageBox.Show("删除成功");
-
+                {                    
+                    MessageBox.Show("文件与记录删除成功");
                 }
                 else
                 {
 
                     MessageBox.Show("该时间段内没有数据");
-                    connect1.sqlstr = "SELECT * FROM " + table + " WHERE \"" + timemin + "\" < BEGIN_TIME < \"" + timemax + "\"";
+                    connect1.sqlstr = "SELECT * FROM " + table + " WHERE BEGIN_TIME >=  \"" + timemin + "\" AND BEGIN_TIME <= \"" + timemax + " \"";
                     comm = new MySqlCommand(connect1.sqlstr, conn);
                     MySqlDataAdapter adap = new MySqlDataAdapter(comm);
                     DataSet ds = new DataSet();
@@ -141,63 +157,6 @@ namespace mysql
             comboBox1.SelectedIndex = comboBox1.Items.IndexOf("record_item");
         }
 
-
-        /*private void button4_Click(object sender, EventArgs e)//创建文件示例
-        {
-            //参数1：指定要判断的文件路径
-            if (!File.Exists(file1.creat_path))
-            {
-                //参数1：要创建的文件路径，包含文件名称、后缀等
-                FileStream fs = File.Create(file1.creat_path);
-                fs.Close();
-                MessageBox.Show("文件创建成功！");
-            }
-            else
-            {
-                MessageBox.Show("文件已经存在！");
-            }
-        }*/
-       /* private void button4_Click(object sender,EventArgs E)
-        {
-            if (File.Exists(file1.record_path))
-            {
-                File.Delete(file1.record_path);
-                MessageBox.Show("删除成功");
-            }
-            else
-            { MessageBox.Show("文件不存在！"); }
-        }
-        */
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            update_text();
-            string timemin = dateTimePicker1.Value.ToString("yyyy-MM-dd HH:mm");
-            string timemax = dateTimePicker2.Value.ToString("yyyy-MM-dd HH:mm");
-            string timenow = string.Format("{0:d}", System.DateTime.Now);
-            string table = comboBox1.SelectedItem.ToString();
-            connect1.sqlstr = "select BEGIN_TIME FROM " + " record_item" + " WHERE \"" + timemin + "\" < BEGIN_TIME < \"" + timemax + "\"";
-            Console.WriteLine(connect1.sqlstr + connect1.connect_str());
-            comm = new MySqlCommand(connect1.sqlstr,conn);
-            conn.Open();
-            MySqlDataReader dateReader = comm.ExecuteReader();
-            if (dateReader.Read())
-            {
-                string record_begin_time =(string) dateReader[0].ToString();    
-                record_begin_time=record_begin_time.Remove(4,1); record_begin_time = record_begin_time.Remove(5, 1);
-                record_begin_time= record_begin_time.Insert(4,"-" ); record_begin_time= record_begin_time.Insert(6,"-");
-                dateReader.Close();
-                Console.WriteLine("时间: "+record_begin_time);
-                conn.Close();
-                string s = "hello world!"; ;
-                s = s.Remove(0, 1);    //  ello world
-                Console.WriteLine(s);
-                s = s.Insert(0, "H");  //  Hello world
-                Console.WriteLine(s);
-            }
-            else
-            { Console.WriteLine(connect1.sqlstr); }
-            conn.Close();
-        }
+       
     }
 }

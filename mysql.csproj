@@ -76,7 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="connect_mysql.cs" />
-    <Compile Include="file_io.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
